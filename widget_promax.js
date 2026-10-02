@@ -1,4 +1,4 @@
-// Widget Aksesibilitas Pro Max - Custom Built
+﻿// Widget Aksesibilitas Pro Max - Custom Built
 (function() {
     // Inject Font & CSS for the Widget
     const style = document.createElement('style');
@@ -25,7 +25,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             position: fixed;
             bottom: 20px;
-            left: 90px; /* Digeser ke kanan biar sebelah-sebelahan sama musik */
+            left: 20px; /* Balik ke pojok kiri banget */
             z-index: 999999;
         }
 
@@ -99,15 +99,33 @@
 
         /* Header Area */
         .w-header {
-            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.4));
+            background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(240,253,244,0.95));
             padding: 24px;
             position: relative;
             border-bottom: 1px solid var(--w-border-light);
+            overflow: hidden;
+            border-radius: 20px 20px 0 0;
         }
         
+        .w-header::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='400' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M400,0 L400,120 L150,120 Q300,80 350,0 Z' fill='%23e2f5e9' opacity='0.7' /%3E%3Cpath d='M400,0 Q320,60 250,120 L400,120 Z' fill='%23bdf0d0' opacity='0.5' /%3E%3Cpath d='M320,120 Q360,70 400,20 L400,120 Z' fill='%232bd475' opacity='0.3' /%3E%3Cpath d='M350,120 Q370,100 380,80 Q390,100 400,120 Z' fill='%230D7C3E' opacity='0.6' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: bottom right;
+            background-size: auto 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
         #w-modal.w-dark-theme .w-header {
-            background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(15,23,42,0.4));
+            background: linear-gradient(135deg, rgba(15,23,42,0.98), rgba(20,35,60,0.95));
             border-bottom-color: var(--w-border-dark);
+        }
+        
+        #w-modal.w-dark-theme .w-header::before {
+            opacity: 0.15;
         }
 
         .w-header-top {
@@ -115,6 +133,8 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
         }
 
         .w-title-wrap {
@@ -357,7 +377,24 @@
             text-align: center;
             font-size: 11px;
             color: var(--w-text-muted-light);
-            padding: 20px 0 10px;
+            padding: 30px 0 15px;
+            position: relative;
+        }
+
+        .w-footer-brand::before {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0; left: 0; height: 60px;
+            background-image: url("data:image/svg+xml,%3Csvg width='400' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M400,60 L400,20 Q350,10 300,60 Z' fill='%232bd475' opacity='0.3' /%3E%3Cpath d='M300,60 Q280,30 250,60 Z' fill='%23bdf0d0' opacity='0.6' /%3E%3Cpath d='M400,60 Q380,40 370,60 Z' fill='%230D7C3E' opacity='0.5' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: bottom right;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .w-footer-brand > div {
+            position: relative;
+            z-index: 1;
         }
 
     `;
@@ -399,13 +436,8 @@
             <div class="w-header">
                 <div class="w-header-top">
                     <div class="w-title-wrap">
-                        <div class="w-title-icon" id="w-music-toggle" style="cursor: pointer;" title="Play/Pause Musik">
-                            <!-- Music Note SVG -->
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9 18V5l12-2v13"></path>
-                                <circle cx="6" cy="18" r="3"></circle>
-                                <circle cx="18" cy="16" r="3"></circle>
-                            </svg>
+                        <div class="w-title-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
                         </div>
                         <div class="w-title">
                             <h2>Menu Aksesibilitas</h2>
@@ -443,10 +475,7 @@
                     </button>
                 </div>
                 
-                <div class="w-footer-brand">
-                    • Widget Aksesibilitas Version 3.0 Pro Max •<br>
-                    Aksesibilitas untuk pengalaman yang lebih baik
-                </div>
+                <div class="w-footer-brand"><div>✨ Widget Aksesibilitas Version 3.0 Pro Max ✨<br>Aksesibilitas untuk pengalaman yang lebih baik</div></div>
             </div>
         </div>
         <button id="w-trigger-btn"></button>
@@ -459,43 +488,6 @@
     const closeBtn = document.getElementById('w-close-modal');
     const themeSwitch = document.getElementById('w-theme-switch');
     const resetBtn = document.getElementById('w-reset-all');
-    const musicToggleBtn = document.getElementById('w-music-toggle');
-
-    // Music Player Logic
-    let isMusicMuted = false;
-    const iconMusicPlay = `
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 18V5l12-2v13"></path>
-            <circle cx="6" cy="18" r="3"></circle>
-            <circle cx="18" cy="16" r="3"></circle>
-        </svg>`;
-    const iconMusicMute = `
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 18V5l12-2v13"></path>
-            <circle cx="6" cy="18" r="3"></circle>
-            <circle cx="18" cy="16" r="3"></circle>
-            <line x1="2" y1="2" x2="22" y2="22"></line>
-        </svg>`;
-
-    musicToggleBtn?.addEventListener('click', () => {
-        const audios = document.getElementsByTagName('audio');
-        
-        isMusicMuted = !isMusicMuted;
-        
-        if (isMusicMuted) {
-            // Mute / Pause all
-            musicToggleBtn.innerHTML = iconMusicMute;
-            for (let i = 0; i < audios.length; i++) {
-                audios[i].pause();
-            }
-        } else {
-            // Play
-            musicToggleBtn.innerHTML = iconMusicPlay;
-            if (audios.length > 0) {
-                audios[0].play();
-            }
-        }
-    });
 
     triggerBtn.addEventListener('click', () => {
         modal.classList.toggle('active');
