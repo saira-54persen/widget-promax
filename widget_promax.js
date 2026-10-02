@@ -409,18 +409,6 @@
                     </div>
                     <div class="w-close-btn" id="w-close-modal">✕</div>
                 </div>
-                
-                <div class="w-dropdown">
-                    <div class="w-dropdown-icon">ID</div>
-                    Bahasa Indonesia (Indonesian)
-                </div>
-                
-                <div class="w-dropdown">
-                    <div class="w-dropdown-icon">
-                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    </div>
-                    Profil Aksesibilitas
-                </div>
             </div>
 
             <div class="w-body">
@@ -465,6 +453,7 @@
     const modal = document.getElementById('w-modal');
     const closeBtn = document.getElementById('w-close-modal');
     const themeSwitch = document.getElementById('w-theme-switch');
+    const resetBtn = document.getElementById('w-reset-all');
 
     triggerBtn.addEventListener('click', () => {
         modal.classList.toggle('active');
@@ -474,23 +463,123 @@
         modal.classList.remove('active');
     });
 
+    // --- Core Logic ---
+    const htmlEl = document.documentElement;
+    const bodyEl = document.body;
+    
+    // State management
+    let state = {
+        theme: 'light',
+        textSize: 0,
+        saturasi: false,
+        kontras: false,
+        hideImages: false,
+        rataTulisan: false,
+        disleksia: false,
+        lineHeight: false,
+        pauseAnim: false,
+        kursor: false,
+        spasiTeks: false
+    };
+
+    // Style elements for injected CSS
+    const customStyleEl = document.createElement('style');
+    document.head.appendChild(customStyleEl);
+
+    const updateStyles = () => {
+        let css = '';
+        
+        if(state.textSize !== 0) {
+            css += `body, p, a, h1, h2, h3, h4, h5, span, div { font-size: calc(100% + ${state.textSize * 2}px) !important; } `;
+        }
+        if(state.saturasi) css += `html { filter: saturate(50%) !important; } `;
+        if(state.kontras) css += `html { filter: contrast(150%) !important; } `;
+        if(state.hideImages) css += `img, video, iframe, [style*="background-image"] { display: none !important; } `;
+        if(state.rataTulisan) css += `p, div, span, h1, h2, h3 { text-align: justify !important; } `;
+        if(state.disleksia) css += `body, p, a, h1, h2, h3, h4, h5, span, div { font-family: "OpenDyslexic", "Comic Sans MS", sans-serif !important; } `;
+        if(state.lineHeight) css += `body, p, a, span, div { line-height: 2 !important; } `;
+        if(state.pauseAnim) css += `* { animation: none !important; transition: none !important; } `;
+        if(state.kursor) css += `* { cursor: url('https://cdn.custom-cursor.com/db/8343/32/arrow32.png'), auto !important; } `;
+        if(state.spasiTeks) css += `body, p, a, h1, h2, h3, h4, h5, span, div { letter-spacing: 2px !important; word-spacing: 4px !important; } `;
+        
+        customStyleEl.innerHTML = css;
+    };
+
     themeSwitch.addEventListener('change', (e) => {
-        if (e.target.checked) {
+        state.theme = e.target.checked ? 'dark' : 'light';
+        if (state.theme === 'dark') {
             modal.classList.add('w-dark-theme');
+            bodyEl.classList.add('w-global-dark-mode'); 
+            // Global dark mode class can be styled if needed by users
         } else {
             modal.classList.remove('w-dark-theme');
+            bodyEl.classList.remove('w-global-dark-mode');
         }
     });
 
-    // Add dummy active toggle logic for buttons
-    features.forEach(f => {
-        const btn = document.getElementById('w-btn-' + f.id);
+    // Feature Handlers
+    const toggleBtnState = (id, isActive) => {
+        const btn = document.getElementById('w-btn-' + id);
+        if(btn) {
+            if(isActive) btn.classList.add('active');
+            else btn.classList.remove('active');
+        }
+    };
+
+    document.getElementById('w-btn-perbesar_teks')?.addEventListener('click', () => {
+        state.textSize += 1;
+        updateStyles();
+    });
+
+    document.getElementById('w-btn-perkecil_teks')?.addEventListener('click', () => {
+        state.textSize -= 1;
+        updateStyles();
+    });
+
+    const toggleFilters = [
+        { id: 'kejenuhan', stateKey: 'saturasi' },
+        { id: 'kontras', stateKey: 'kontras' },
+        { id: 'sembunyikan_gambar', stateKey: 'hideImages' },
+        { id: 'rata_tulisan', stateKey: 'rataTulisan' },
+        { id: 'ramah_disleksia', stateKey: 'disleksia' },
+        { id: 'tinggi_garis', stateKey: 'lineHeight' },
+        { id: 'animasi_dijeda', stateKey: 'pauseAnim' },
+        { id: 'kursor', stateKey: 'kursor' },
+        { id: 'spasi_teks', stateKey: 'spasiTeks' },
+    ];
+
+    toggleFilters.forEach(filter => {
+        const btn = document.getElementById('w-btn-' + filter.id);
         if(btn) {
             btn.addEventListener('click', () => {
-                btn.classList.toggle('active');
-                // Real functionality will be wired up here
+                state[filter.stateKey] = !state[filter.stateKey];
+                toggleBtnState(filter.id, state[filter.stateKey]);
+                updateStyles();
             });
         }
+    });
+
+    // Suara
+    document.getElementById('w-btn-moda_suara')?.addEventListener('click', () => {
+        state.suaraActive = !state.suaraActive;
+        toggleBtnState('moda_suara', state.suaraActive);
+        if(state.suaraActive && window.responsiveVoice) {
+            responsiveVoice.speak("Moda suara diaktifkan. Anda sekarang dapat mendengar teks di layar.", "Indonesian Female");
+        }
+    });
+
+    // Reset All
+    resetBtn.addEventListener('click', () => {
+        state = { theme: 'light', textSize: 0, saturasi: false, kontras: false, hideImages: false, rataTulisan: false, disleksia: false, lineHeight: false, pauseAnim: false, kursor: false, spasiTeks: false, suaraActive: false };
+        updateStyles();
+        
+        themeSwitch.checked = false;
+        modal.classList.remove('w-dark-theme');
+        
+        toggleFilters.forEach(f => toggleBtnState(f.id, false));
+        toggleBtnState('moda_suara', false);
+        
+        if(window.responsiveVoice) responsiveVoice.cancel();
     });
 
 })();
