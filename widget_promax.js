@@ -380,21 +380,21 @@
     ];
 
     const generateGrid = () => {
-        return features.map(f => \`
-            <div class="w-card" id="w-btn-\${f.id}">
-                <div class="w-card-icon \${f.color}">\${f.icon}</div>
+        return features.map(f => `
+            <div class="w-card" id="w-btn-${f.id}">
+                <div class="w-card-icon ${f.color}">${f.icon}</div>
                 <div style="flex:1">
-                    <div class="w-card-title w-text-main">\${f.title}</div>
-                    <div class="w-card-desc w-text-sub">\${f.desc}</div>
+                    <div class="w-card-title w-text-main">${f.title}</div>
+                    <div class="w-card-desc w-text-sub">${f.desc}</div>
                 </div>
             </div>
-        \`).join('');
+        `).join('');
     };
 
     // Build DOM
     const container = document.createElement('div');
     container.id = 'w-promax-container';
-    container.innerHTML = \`
+    container.innerHTML = `
         <div id="w-modal">
             <div class="w-header">
                 <div class="w-header-top">
@@ -438,7 +438,7 @@
                 </div>
 
                 <div class="w-grid">
-                    \${generateGrid()}
+                    ${generateGrid()}
                 </div>
 
                 <div class="w-reset-box">
@@ -457,7 +457,7 @@
             </div>
         </div>
         <button id="w-trigger-btn"></button>
-    \`;
+    `;
     document.body.appendChild(container);
 
     // Logic
