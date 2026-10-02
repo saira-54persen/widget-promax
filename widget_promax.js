@@ -25,7 +25,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             position: fixed;
             bottom: 20px;
-            left: 20px;
+            left: 90px; /* Digeser ke kanan biar sebelah-sebelahan sama musik */
             z-index: 999999;
         }
 
@@ -399,8 +399,13 @@
             <div class="w-header">
                 <div class="w-header-top">
                     <div class="w-title-wrap">
-                        <div class="w-title-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                        <div class="w-title-icon" id="w-music-toggle" style="cursor: pointer;" title="Play/Pause Musik">
+                            <!-- Music Note SVG -->
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 18V5l12-2v13"></path>
+                                <circle cx="6" cy="18" r="3"></circle>
+                                <circle cx="18" cy="16" r="3"></circle>
+                            </svg>
                         </div>
                         <div class="w-title">
                             <h2>Menu Aksesibilitas</h2>
@@ -454,6 +459,43 @@
     const closeBtn = document.getElementById('w-close-modal');
     const themeSwitch = document.getElementById('w-theme-switch');
     const resetBtn = document.getElementById('w-reset-all');
+    const musicToggleBtn = document.getElementById('w-music-toggle');
+
+    // Music Player Logic
+    let isMusicMuted = false;
+    const iconMusicPlay = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+        </svg>`;
+    const iconMusicMute = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+            <line x1="2" y1="2" x2="22" y2="22"></line>
+        </svg>`;
+
+    musicToggleBtn?.addEventListener('click', () => {
+        const audios = document.getElementsByTagName('audio');
+        
+        isMusicMuted = !isMusicMuted;
+        
+        if (isMusicMuted) {
+            // Mute / Pause all
+            musicToggleBtn.innerHTML = iconMusicMute;
+            for (let i = 0; i < audios.length; i++) {
+                audios[i].pause();
+            }
+        } else {
+            // Play
+            musicToggleBtn.innerHTML = iconMusicPlay;
+            if (audios.length > 0) {
+                audios[0].play();
+            }
+        }
+    });
 
     triggerBtn.addEventListener('click', () => {
         modal.classList.toggle('active');
@@ -559,27 +601,105 @@
         }
     });
 
-    // Suara
+    // Suara (Text-to-Speech)
+    let currentUtterance = null;
+    let voiceMode = 0; // 0: off, 1: female, 2: male
+    let availableVoices = [];
+
+    // Load voices
+    const loadVoices = () => {
+        availableVoices = window.speechSynthesis.getVoices().filter(v => v.lang.includes('id') || v.lang.includes('ID'));
+    };
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+    loadVoices();
+
+    const speakText = (text, forceVoiceType = null) => {
+        if(window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+        if(!text || text.trim() === '') return;
+
+        currentUtterance = new SpeechSynthesisUtterance(text);
+        currentUtterance.lang = 'id-ID';
+        currentUtterance.rate = 0.9;
+
+        // Try to pick male/female if requested and available
+        let type = forceVoiceType || (voiceMode === 1 ? 'female' : 'male');
+        if (availableVoices.length > 0) {
+            // Very basic heuristic: 'gadis' or 'female' in name
+            let selectedVoice = availableVoices.find(v => {
+                let name = v.name.toLowerCase();
+                if(type === 'female') return name.includes('gadis') || name.includes('female') || name.includes('perempuan') || name.includes('google');
+                else return name.includes('andika') || name.includes('male') || name.includes('laki');
+            });
+            // Fallback to first available if not found
+            if(!selectedVoice) selectedVoice = availableVoices[0];
+            currentUtterance.voice = selectedVoice;
+        }
+        
+        window.speechSynthesis.speak(currentUtterance);
+    };
+
+    const handleHoverSpeak = (e) => {
+        if(voiceMode === 0) return;
+        const target = e.target;
+        const text = target.innerText || target.textContent;
+        // Only speak if it has reasonable text length and is a readable element
+        if(text && text.length > 2 && text.length < 500 && ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'A', 'SPAN', 'BUTTON', 'LI'].includes(target.tagName)) {
+            // Debounce slightly to avoid speaking every single tiny element immediately
+            target.speakTimeout = setTimeout(() => {
+                speakText(text);
+            }, 500);
+        }
+    };
+    
+    const handleHoverOut = (e) => {
+        if(e.target.speakTimeout) clearTimeout(e.target.speakTimeout);
+    };
+
     document.getElementById('w-btn-moda_suara')?.addEventListener('click', () => {
-        state.suaraActive = !state.suaraActive;
-        toggleBtnState('moda_suara', state.suaraActive);
-        if(state.suaraActive && window.responsiveVoice) {
-            responsiveVoice.speak("Moda suara diaktifkan. Anda sekarang dapat mendengar teks di layar.", "Indonesian Female");
+        voiceMode = (voiceMode + 1) % 3; // Cycle: 0 -> 1 -> 2 -> 0
+        const btn = document.getElementById('w-btn-moda_suara');
+        
+        if (voiceMode === 1) {
+            btn.classList.add('active');
+            btn.querySelector('.w-card-desc').innerText = "Suara: Perempuan";
+            speakText("Mode suara perempuan diaktifkan. Arahkan kursor ke teks untuk membaca.", 'female');
+            document.addEventListener('mouseover', handleHoverSpeak);
+            document.addEventListener('mouseout', handleHoverOut);
+        } else if (voiceMode === 2) {
+            btn.classList.add('active');
+            btn.querySelector('.w-card-desc').innerText = "Suara: Laki-laki";
+            speakText("Mode suara laki-laki diaktifkan.", 'male');
+        } else {
+            btn.classList.remove('active');
+            btn.querySelector('.w-card-desc').innerText = "Bantuan suara dan audio";
+            if(window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+            document.removeEventListener('mouseover', handleHoverSpeak);
+            document.removeEventListener('mouseout', handleHoverOut);
         }
     });
 
     // Reset All
     resetBtn.addEventListener('click', () => {
-        state = { theme: 'light', textSize: 0, saturasi: false, kontras: false, hideImages: false, rataTulisan: false, disleksia: false, lineHeight: false, pauseAnim: false, kursor: false, spasiTeks: false, suaraActive: false };
+        state = { theme: 'light', textSize: 0, saturasi: false, kontras: false, hideImages: false, rataTulisan: false, disleksia: false, lineHeight: false, pauseAnim: false, kursor: false, spasiTeks: false };
         updateStyles();
         
         themeSwitch.checked = false;
         modal.classList.remove('w-dark-theme');
         
         toggleFilters.forEach(f => toggleBtnState(f.id, false));
-        toggleBtnState('moda_suara', false);
         
-        if(window.responsiveVoice) responsiveVoice.cancel();
+        // Reset Voice
+        voiceMode = 0;
+        const voiceBtn = document.getElementById('w-btn-moda_suara');
+        if(voiceBtn) {
+            voiceBtn.classList.remove('active');
+            voiceBtn.querySelector('.w-card-desc').innerText = "Bantuan suara dan audio";
+        }
+        if(window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+        document.removeEventListener('mouseover', handleHoverSpeak);
+        document.removeEventListener('mouseout', handleHoverOut);
     });
 
 })();
