@@ -740,7 +740,7 @@
         }
         
         /* Paksa Tombol Top-Up (Bawaan Tema) Geser Kiri */
-        .back-top, .backTotop, .ignielToTop, #back-to-top, .gotop, #gotop, .btn-top, .to-top, .scroll-top, .backToTop {
+        .back-top, .backTotop, .ignielToTop, #back-to-top, .gotop, #gotop, .btn-top, .to-top, .scroll-top, .backToTop, #backToTopBtn {
             right: 85px !important;
         }
 
