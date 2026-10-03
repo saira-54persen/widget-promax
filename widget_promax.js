@@ -694,4 +694,9 @@
         document.removeEventListener('mouseout', handleHoverOut);
     });
 
+    // Auto Lazy Load Global (Dijalankan sekali saat script dimuat)
+    document.querySelectorAll('img:not([loading="lazy"])').forEach(img => {
+        img.setAttribute('loading', 'lazy');
+    });
+
 })();
