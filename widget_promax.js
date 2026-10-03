@@ -700,62 +700,113 @@
     });
 
     // ==========================================
-    // AUTO-TRANSLATE GLOBAL (PRO MAX UI)
+    // AUTO-TRANSLATE GLOBAL (CUSTOM MODAL PRO MAX)
     // ==========================================
     const tStyle = document.createElement('style');
     tStyle.innerHTML = `
-        #google_translate_element {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            z-index: 999999;
-            background: #ffffff;
-            padding: 8px 12px;
-            border-radius: 30px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            border: 2px solid rgba(13, 124, 62, 0.2);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
-        #google_translate_element:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(13, 124, 62, 0.25);
-            border-color: #0D7C3E;
-        }
-        /* Hide Google's ugly branding */
-        .goog-te-gadget {
-            font-family: 'Plus Jakarta Sans', sans-serif !important;
-            color: transparent !important;
-            font-size: 0 !important;
-        }
-        .goog-te-gadget .goog-te-combo {
-            font-family: 'Plus Jakarta Sans', sans-serif !important;
-            font-size: 14px !important;
-            font-weight: 600 !important;
-            color: #0f172a !important;
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            outline: none;
-            cursor: pointer;
-            margin: 0;
-            background-color: #f8fafc;
-        }
-        .goog-te-gadget span { display: none !important; }
-        .goog-logo-link { display: none !important; }
+        /* Sembunyikan Bawaan Google Translate Sepenuhnya */
+        #google_translate_element { display: none !important; }
         .goog-te-banner-frame.skiptranslate { display: none !important; }
         body { top: 0px !important; }
-        
-        /* Custom Globe Icon */
-        #google_translate_element::before {
-            content: "🌍";
-            font-size: 22px;
-            margin-right: 10px;
+        .goog-tooltip { display: none !important; }
+        .goog-tooltip:hover { display: none !important; }
+        .goog-text-highlight { background-color: transparent !important; border: none !important; box-shadow: none !important; }
+
+        /* Trigger Button Baru (Sebelah Kanan) */
+        #w-translate-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0D7C3E, #15A050);
+            color: white;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(13,124,62,0.4);
+            cursor: pointer;
+            z-index: 999999;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            border: 2px solid rgba(255,255,255,0.2);
         }
+        #w-translate-trigger:hover {
+            transform: scale(1.1) rotate(-5deg);
+            box-shadow: 0 15px 35px rgba(13,124,62,0.6);
+        }
+
+        /* Modal Translate */
+        #w-translate-modal {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 320px;
+            background: var(--w-bg-light, #ffffff);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            z-index: 999999;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.95);
+            transform-origin: bottom right;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(13,124,62,0.1);
+            overflow: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        #w-translate-modal.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        
+        .wt-header {
+            background: linear-gradient(135deg, #0f4c28, #15A050);
+            padding: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .wt-title { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px;}
+        .wt-close { cursor: pointer; background: rgba(255,255,255,0.2); width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; transition: 0.2s; }
+        .wt-close:hover { background: rgba(255,255,255,0.4); }
+
+        .wt-body {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .wt-lang-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .wt-lang-btn:hover {
+            border-color: #0D7C3E;
+            background: #f0fdf4;
+            transform: translateY(-2px);
+        }
+        .wt-flag { font-size: 24px; }
+        .wt-name { font-size: 12px; font-weight: 600; color: #1e293b; }
     `;
     document.head.appendChild(tStyle);
 
+    // Google Translate Hidden Element
     const tDiv = document.createElement('div');
     tDiv.id = 'google_translate_element';
     document.body.appendChild(tDiv);
@@ -772,5 +823,62 @@
     tScript.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
     tScript.async = true;
     document.body.appendChild(tScript);
+
+    // Build Custom UI
+    const languages = [
+        { code: 'id', name: 'Indonesia', flag: '🇮🇩' },
+        { code: 'en', name: 'English', flag: '🇬🇧' },
+        { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+        { code: 'ms', name: 'Melayu', flag: '🇲🇾' },
+        { code: 'ja', name: '日本語', flag: '🇯🇵' },
+        { code: 'ko', name: '한국어', flag: '🇰🇷' },
+        { code: 'zh-CN', name: '中文', flag: '🇨🇳' },
+        { code: 'ru', name: 'Русский', flag: '🇷🇺' }
+    ];
+
+    const wTranslateContainer = document.createElement('div');
+    wTranslateContainer.innerHTML = `
+        <div id="w-translate-trigger" title="Translate Website">🌍</div>
+        <div id="w-translate-modal">
+            <div class="wt-header">
+                <div class="wt-title">🌍 Pilih Bahasa</div>
+                <div class="wt-close" id="wt-close-btn">✕</div>
+            </div>
+            <div class="wt-body">
+                ${languages.map(lang => \`
+                    <div class="wt-lang-btn" data-lang="\${lang.code}">
+                        <div class="wt-flag">\${lang.flag}</div>
+                        <div class="wt-name">\${lang.name}</div>
+                    </div>
+                \`).join('')}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(wTranslateContainer);
+
+    const wtTrigger = document.getElementById('w-translate-trigger');
+    const wtModal = document.getElementById('w-translate-modal');
+    const wtClose = document.getElementById('wt-close-btn');
+
+    wtTrigger.addEventListener('click', () => {
+        wtModal.classList.toggle('active');
+    });
+    wtClose.addEventListener('click', () => {
+        wtModal.classList.remove('active');
+    });
+
+    // Handle Translation
+    document.querySelectorAll('.wt-lang-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const langCode = e.currentTarget.getAttribute('data-lang');
+            // Trigger Google Translate select
+            const selectEl = document.querySelector('.goog-te-combo');
+            if(selectEl) {
+                selectEl.value = langCode;
+                selectEl.dispatchEvent(new Event('change'));
+            }
+            wtModal.classList.remove('active');
+        });
+    });
 
 })();
