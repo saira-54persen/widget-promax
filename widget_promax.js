@@ -707,6 +707,9 @@
         /* Sembunyikan Bawaan Google Translate Sepenuhnya (Jangan pakai display none biar mesinnya tetep jalan!) */
         #google_translate_element { opacity: 0 !important; position: absolute !important; left: -9999px !important; z-index: -999 !important; pointer-events: none !important; }
         .goog-te-banner-frame { display: none !important; }
+        .goog-te-menu-frame { display: none !important; }
+        .goog-te-menu2 { display: none !important; }
+        iframe.skiptranslate { display: none !important; }
         .goog-te-banner-frame.skiptranslate { display: none !important; }
         body { top: 0px !important; position: static !important; }
         .goog-tooltip { display: none !important; }
@@ -887,8 +890,15 @@
             const selectEl = document.querySelector('.goog-te-combo');
             if(selectEl) {
                 selectEl.value = langCode;
-                // Harus pakai bubbles: true biar listener Google nangkep eventnya
-                selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+                // Jurus rahasia HTMLEvents biar Google Translate nggak ngeluarin popup aneh
+                let evt;
+                if (document.createEvent) {
+                    evt = document.createEvent('HTMLEvents');
+                    evt.initEvent('change', true, true);
+                    selectEl.dispatchEvent(evt);
+                } else {
+                    selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+                }
             } else {
                 // Fallback 100% jalan: Ganti cookie dan reload
                 document.cookie = "googtrans=/id/" + langCode + "; path=/; domain=." + document.domain;
