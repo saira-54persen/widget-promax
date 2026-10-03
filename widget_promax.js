@@ -1,4 +1,4 @@
-﻿// Widget Aksesibilitas Pro Max - Custom Built
+// Widget Aksesibilitas Pro Max - Custom Built
 (function() {
     // Inject Font & CSS for the Widget
     const style = document.createElement('style');
@@ -475,7 +475,7 @@
                     </button>
                 </div>
                 
-                <div class="w-footer-brand"><div>✨ Widget Aksesibilitas Version 3.0 Pro Max ✨<br>Aksesibilitas untuk pengalaman yang lebih baik</div></div>
+                <div class="w-footer-brand"><div>Widget Aksesibilitas Version 3.0 Pro Max<br>Aksesibilitas untuk pengalaman yang lebih baik dari SAIRA 54PERSEN ISLAM</div></div>
             </div>
         </div>
         <button id="w-trigger-btn"></button>
