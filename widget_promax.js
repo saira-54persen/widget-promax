@@ -704,8 +704,8 @@
     // ==========================================
     const tStyle = document.createElement('style');
     tStyle.innerHTML = `
-        /* Sembunyikan Bawaan Google Translate Sepenuhnya */
-        #google_translate_element { display: none !important; }
+        /* Sembunyikan Bawaan Google Translate Sepenuhnya (Jangan pakai display none biar mesinnya tetep jalan!) */
+        #google_translate_element { opacity: 0 !important; position: absolute !important; left: -9999px !important; z-index: -999 !important; pointer-events: none !important; }
         .goog-te-banner-frame { display: none !important; }
         .goog-te-banner-frame.skiptranslate { display: none !important; }
         body { top: 0px !important; position: static !important; }
@@ -889,6 +889,11 @@
                 selectEl.value = langCode;
                 // Harus pakai bubbles: true biar listener Google nangkep eventnya
                 selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+            } else {
+                // Fallback 100% jalan: Ganti cookie dan reload
+                document.cookie = "googtrans=/id/" + langCode + "; path=/; domain=." + document.domain;
+                document.cookie = "googtrans=/id/" + langCode + "; path=/";
+                window.location.reload();
             }
             wtModal.classList.remove('active');
         });
