@@ -847,12 +847,12 @@
                 <div class="wt-close" id="wt-close-btn">✕</div>
             </div>
             <div class="wt-body">
-                ${languages.map(lang => \`
-                    <div class="wt-lang-btn" data-lang="\${lang.code}">
-                        <div class="wt-flag">\${lang.flag}</div>
-                        <div class="wt-name">\${lang.name}</div>
+                ${languages.map(lang => `
+                    <div class="wt-lang-btn" data-lang="${lang.code}">
+                        <div class="wt-flag">${lang.flag}</div>
+                        <div class="wt-name">${lang.name}</div>
                     </div>
-                \`).join('')}
+                `).join('')}
             </div>
         </div>
     `;
