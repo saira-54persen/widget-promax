@@ -711,6 +711,10 @@
         .goog-te-menu2 { display: none !important; }
         iframe.skiptranslate { display: none !important; }
         .goog-te-banner-frame.skiptranslate { display: none !important; }
+        /* Pembunuh Banner Modern Google Translate */
+        .VIpgJd-ZVi9od-ORHb-OEVmcd { display: none !important; }
+        .VIpgJd-ZVi9od-aZ2wEe-wOHMyf { display: none !important; }
+        #goog-gt-tt { display: none !important; }
         body { top: 0px !important; position: static !important; }
         .goog-tooltip { display: none !important; }
         .goog-tooltip:hover { display: none !important; }
