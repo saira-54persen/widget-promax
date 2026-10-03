@@ -699,4 +699,78 @@
         img.setAttribute('loading', 'lazy');
     });
 
+    // ==========================================
+    // AUTO-TRANSLATE GLOBAL (PRO MAX UI)
+    // ==========================================
+    const tStyle = document.createElement('style');
+    tStyle.innerHTML = `
+        #google_translate_element {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 999999;
+            background: #ffffff;
+            padding: 8px 12px;
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border: 2px solid rgba(13, 124, 62, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        #google_translate_element:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(13, 124, 62, 0.25);
+            border-color: #0D7C3E;
+        }
+        /* Hide Google's ugly branding */
+        .goog-te-gadget {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            color: transparent !important;
+            font-size: 0 !important;
+        }
+        .goog-te-gadget .goog-te-combo {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            color: #0f172a !important;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            outline: none;
+            cursor: pointer;
+            margin: 0;
+            background-color: #f8fafc;
+        }
+        .goog-te-gadget span { display: none !important; }
+        .goog-logo-link { display: none !important; }
+        .goog-te-banner-frame.skiptranslate { display: none !important; }
+        body { top: 0px !important; }
+        
+        /* Custom Globe Icon */
+        #google_translate_element::before {
+            content: "🌍";
+            font-size: 22px;
+            margin-right: 10px;
+        }
+    `;
+    document.head.appendChild(tStyle);
+
+    const tDiv = document.createElement('div');
+    tDiv.id = 'google_translate_element';
+    document.body.appendChild(tDiv);
+
+    window.googleTranslateElementInit = function() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'id',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
+        }, 'google_translate_element');
+    };
+
+    const tScript = document.createElement('script');
+    tScript.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    tScript.async = true;
+    document.body.appendChild(tScript);
+
 })();
