@@ -706,23 +706,25 @@
     tStyle.innerHTML = `
         /* Sembunyikan Bawaan Google Translate Sepenuhnya */
         #google_translate_element { display: none !important; }
+        .goog-te-banner-frame { display: none !important; }
         .goog-te-banner-frame.skiptranslate { display: none !important; }
-        body { top: 0px !important; }
+        body { top: 0px !important; position: static !important; }
         .goog-tooltip { display: none !important; }
         .goog-tooltip:hover { display: none !important; }
         .goog-text-highlight { background-color: transparent !important; border: none !important; box-shadow: none !important; }
+        font { background: transparent !important; }
 
-        /* Trigger Button Baru (Sebelah Kanan) */
+        /* Trigger Button Baru (Sebelah Kanan, Agak ke Atas) */
         #w-translate-trigger {
             position: fixed;
-            bottom: 20px;
+            bottom: 90px; /* Digeser ke atas biar gak numpuk sama tombol Top-Up */
             right: 20px;
-            width: 64px;
-            height: 64px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: linear-gradient(135deg, #0D7C3E, #15A050);
             color: white;
-            font-size: 28px;
+            font-size: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -740,7 +742,7 @@
         /* Modal Translate */
         #w-translate-modal {
             position: fixed;
-            bottom: 100px;
+            bottom: 160px;
             right: 20px;
             width: 320px;
             background: var(--w-bg-light, #ffffff);
