@@ -855,6 +855,15 @@
         { code: 'ru', name: 'Русский', flag: 'ru' }
     ];
 
+    // Nuklir penghancur toolbar Google Translate (Jalan terus menerus di background)
+    setInterval(() => {
+        document.querySelectorAll('.goog-te-banner-frame, iframe.skiptranslate, .VIpgJd-ZVi9od-ORHb-OEVmcd, iframe[src*="translate.googleapis.com"]').forEach(el => {
+            el.style.cssText = 'display:none!important; opacity:0!important; height:0!important; visibility:hidden!important; pointer-events:none!important;';
+        });
+        document.body.style.top = '0px';
+        document.body.style.position = 'static';
+    }, 100);
+
     const wTranslateContainer = document.createElement('div');
     wTranslateContainer.innerHTML = `
         <div id="w-translate-trigger" title="Translate Website">🌍</div>
