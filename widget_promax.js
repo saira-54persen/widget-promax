@@ -714,17 +714,17 @@
         .goog-text-highlight { background-color: transparent !important; border: none !important; box-shadow: none !important; }
         font { background: transparent !important; }
 
-        /* Trigger Button Baru (Sebelah Kanan, Agak ke Atas) */
+        /* Trigger Button Baru (Sebelah Kanan Pol) */
         #w-translate-trigger {
             position: fixed;
-            bottom: 90px; /* Digeser ke atas biar gak numpuk sama tombol Top-Up */
-            right: 20px;
-            width: 60px;
-            height: 60px;
+            bottom: 20px;
+            right: 20px;  /* Translate di kanan mentok */
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
             background: linear-gradient(135deg, #0D7C3E, #15A050);
             color: white;
-            font-size: 26px;
+            font-size: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -738,11 +738,16 @@
             transform: scale(1.1) rotate(-5deg);
             box-shadow: 0 15px 35px rgba(13,124,62,0.6);
         }
+        
+        /* Paksa Tombol Top-Up (Bawaan Tema) Geser Kiri */
+        .back-top, .backTotop, .ignielToTop, #back-to-top, .gotop, #gotop, .btn-top, .to-top, .scroll-top, .backToTop {
+            right: 85px !important;
+        }
 
         /* Modal Translate */
         #w-translate-modal {
             position: fixed;
-            bottom: 160px;
+            bottom: 90px;
             right: 20px;
             width: 320px;
             background: var(--w-bg-light, #ffffff);
@@ -796,14 +801,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         .wt-lang-btn:hover {
             border-color: #0D7C3E;
             background: #f0fdf4;
             transform: translateY(-2px);
         }
-        .wt-flag { font-size: 24px; }
+        .wt-flag { 
+            width: 32px; 
+            height: 24px; 
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            object-fit: cover;
+        }
         .wt-name { font-size: 12px; font-weight: 600; color: #1e293b; }
     `;
     document.head.appendChild(tStyle);
@@ -828,14 +839,14 @@
 
     // Build Custom UI
     const languages = [
-        { code: 'id', name: 'Indonesia', flag: '🇮🇩' },
-        { code: 'en', name: 'English', flag: '🇬🇧' },
-        { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-        { code: 'ms', name: 'Melayu', flag: '🇲🇾' },
-        { code: 'ja', name: '日本語', flag: '🇯🇵' },
-        { code: 'ko', name: '한국어', flag: '🇰🇷' },
-        { code: 'zh-CN', name: '中文', flag: '🇨🇳' },
-        { code: 'ru', name: 'Русский', flag: '🇷🇺' }
+        { code: 'id', name: 'Indonesia', flag: 'id' },
+        { code: 'en', name: 'English', flag: 'gb' },
+        { code: 'ar', name: 'العربية', flag: 'sa' },
+        { code: 'ms', name: 'Melayu', flag: 'my' },
+        { code: 'ja', name: '日本語', flag: 'jp' },
+        { code: 'ko', name: '한국어', flag: 'kr' },
+        { code: 'zh-CN', name: '中文', flag: 'cn' },
+        { code: 'ru', name: 'Русский', flag: 'ru' }
     ];
 
     const wTranslateContainer = document.createElement('div');
@@ -849,7 +860,7 @@
             <div class="wt-body">
                 ${languages.map(lang => `
                     <div class="wt-lang-btn" data-lang="${lang.code}">
-                        <div class="wt-flag">${lang.flag}</div>
+                        <img src="https://flagcdn.com/w40/${lang.flag}.png" class="wt-flag" alt="${lang.name}">
                         <div class="wt-name">${lang.name}</div>
                     </div>
                 `).join('')}
@@ -873,11 +884,12 @@
     document.querySelectorAll('.wt-lang-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const langCode = e.currentTarget.getAttribute('data-lang');
-            // Trigger Google Translate select
+            // Cek apakah Google Translate select sudah dirender
             const selectEl = document.querySelector('.goog-te-combo');
             if(selectEl) {
                 selectEl.value = langCode;
-                selectEl.dispatchEvent(new Event('change'));
+                // Harus pakai bubbles: true biar listener Google nangkep eventnya
+                selectEl.dispatchEvent(new Event('change', { bubbles: true }));
             }
             wtModal.classList.remove('active');
         });
