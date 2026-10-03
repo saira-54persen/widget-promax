@@ -827,7 +827,6 @@
     window.googleTranslateElementInit = function() {
         new google.translate.TranslateElement({
             pageLanguage: 'id',
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
             autoDisplay: false
         }, 'google_translate_element');
     };
