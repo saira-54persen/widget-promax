@@ -475,7 +475,7 @@
                     </button>
                 </div>
                 
-                <div class="w-footer-brand"><div>Widget Aksesibilitas Version 3.0 Pro Max<br>Aksesibilitas untuk pengalaman yang lebih baik dari SAIRA 54PERSEN ISLAM</div></div>
+                <div class="w-footer-brand"><div>Widget Aksesibilitas Version 3.0 Pro Max<br>Aksesibilitas untuk pengalaman yang lebih baik<br>dari SAIRA 54PERSEN ISLAM</div></div>
             </div>
         </div>
         <button id="w-trigger-btn"></button>
